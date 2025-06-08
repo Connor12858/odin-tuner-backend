@@ -29,20 +29,31 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
     }
 
     const result = fs.readFileSync(outputPath, "utf-8");
-    res.json({ content: result });
+    res.json({ content: result, originalFilePath: inputPath });
 
     fs.unlinkSync(inputPath);
     fs.unlinkSync(outputPath);
   });
 });
 
-app.post("/api/download", newData, (req, res) => {
-  const newData = newData;
-  const outputPath = `new_data_out.txt`;
+app.post("/api/download", express.json(), (req, res) => {
+  const { originalFilePath, newData } = req.body;
 
-  console.log("Ran download");
+  if (!originalFilePath || !newData) {
+    return res.status(400).json({ error: "Missing original file or new data" });
+  }
 
-  exec(`python3 modifier.py ${newData} ${outputPath}`, (err) => {
+  const outputPath = `${originalFilePath}_modified.csv`;
+
+  // Write the dictionary to a temp JSON file
+  const jsonPath = `${originalFilePath}_map.json`;
+  fs.writeFileSync(jsonPath, JSON.stringify(newData));
+
+  console.log("Running modifier.py with:");
+  console.log("Original File:", originalFilePath);
+  console.log("Value Map JSON:", jsonPath);
+
+  exec(`python3 modifier.py ${originalFilePath} ${jsonPath} ${outputPath}`, (err) => {
     if (err) {
       console.error("Python script failed:", err);
       return res.status(500).send("Python script failed");
@@ -52,6 +63,7 @@ app.post("/api/download", newData, (req, res) => {
     res.json({ content: result });
 
     fs.unlinkSync(outputPath);
+    fs.unlinkSync(jsonPath);
   });
 });
 
