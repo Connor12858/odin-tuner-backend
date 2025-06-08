@@ -15,8 +15,12 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
-  const inputPath = `/tmp/${req.file.filename}`;
-  const outputPath = `/tmp/${req.file.filename}_out.txt`;
+  const inputPath = req.file.path; // FIXED LINE
+  const outputPath = `${inputPath}_out.txt`;
+
+  console.log("Input path:", inputPath);
+  console.log("Output path:", outputPath);
+
 
   exec(`python3 processor.py ${inputPath} ${outputPath}`, (err) => {
     if (err) {
