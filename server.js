@@ -36,5 +36,22 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   });
 });
 
+app.post("/api/download", upload.single("file"), (req, res) => {
+  const newData = "";
+  const outputPath = `new_data_out.txt`;
+  exec(`python3 modifier.py ${inputPath} ${outputPath}`, (err) => {
+    if (err) {
+      console.error("Python script failed:", err);
+      return res.status(500).send("Python script failed");
+    }
+
+    const result = fs.readFileSync(outputPath, "utf-8");
+    res.json({ content: result });
+
+    fs.unlinkSync(inputPath);
+    fs.unlinkSync(outputPath);
+  });
+});
+
 const port = process.env.PORT || 10000;
 app.listen(port, () => console.log(`Backend running on ${port}`));
