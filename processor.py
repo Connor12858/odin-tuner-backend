@@ -19,9 +19,7 @@ for line in lines:
 
 with open(output_path, 'w') as f:
     for key, value in data.items():
-        f.write(f"{key},{value}\n")
-
-
+        f.write(f"{value},{key}\n")
 
 # import csv
 
