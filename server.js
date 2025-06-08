@@ -1,8 +1,10 @@
+// server.js
 const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
 const { exec } = require("child_process");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -15,12 +17,8 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
-  const inputPath = req.file.path; // FIXED LINE
+  const inputPath = req.file.path;
   const outputPath = `${inputPath}_out.txt`;
-
-  // console.log("Input path:", inputPath);
-  // console.log("Output path:", outputPath);
-
 
   exec(`python3 processor.py ${inputPath} ${outputPath}`, (err) => {
     if (err) {
@@ -31,27 +29,21 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
     const result = fs.readFileSync(outputPath, "utf-8");
     res.json({ content: result, originalFilePath: inputPath });
 
-    fs.unlinkSync(inputPath);
-    fs.unlinkSync(outputPath);
+    fs.unlinkSync(outputPath); // keep inputPath so /api/download can use it
   });
 });
 
-app.post("/api/download", express.json(), (req, res) => {
+app.post("/api/download", (req, res) => {
   const { originalFilePath, newData } = req.body;
 
   if (!originalFilePath || !newData) {
     return res.status(400).json({ error: "Missing original file or new data" });
   }
 
-  const outputPath = `${originalFilePath}_modified.csv`;
-
-  // Write the dictionary to a temp JSON file
+  const outputPath = `${originalFilePath}_modified.odni`;
   const jsonPath = `${originalFilePath}_map.json`;
-  fs.writeFileSync(jsonPath, JSON.stringify(newData));
 
-  console.log("Running modifier.py with:");
-  console.log("Original File:", originalFilePath);
-  console.log("Value Map JSON:", jsonPath);
+  fs.writeFileSync(jsonPath, JSON.stringify(newData));
 
   exec(`python3 modifier.py ${originalFilePath} ${jsonPath} ${outputPath}`, (err) => {
     if (err) {
@@ -64,6 +56,7 @@ app.post("/api/download", express.json(), (req, res) => {
 
     fs.unlinkSync(outputPath);
     fs.unlinkSync(jsonPath);
+    fs.unlinkSync(originalFilePath); // cleanup original after final use
   });
 });
 
