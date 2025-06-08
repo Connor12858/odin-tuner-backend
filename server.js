@@ -36,8 +36,8 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   });
 });
 
-app.post("/api/download", upload.single("file"), (req, res) => {
-  const newData = "hi";
+app.post("/api/download", newData, (req, res) => {
+  const newData = newData;
   const outputPath = `new_data_out.txt`;
 
   console.log("Ran download");
