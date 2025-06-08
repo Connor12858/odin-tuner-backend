@@ -11,10 +11,10 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/api/upload", upload.single("file"), (req, res) => {
-  const inputPath = req.file.path;
-  const outputPath = inputPath + "_out.txt";
+  const inputPath = `/tmp/${req.file.filename}`;
+  const outputPath = `/tmp/${req.file.filename}_out.txt`;
 
-  exec(`python3 ../processor.py ${inputPath} ${outputPath}`, (err) => {
+  exec(`python3 processor.py ${inputPath} ${outputPath}`, (err) => {
     if (err) return res.status(500).send("Python processing failed");
 
     const result = fs.readFileSync(outputPath, "utf-8");
