@@ -18,8 +18,8 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   const inputPath = req.file.path; // FIXED LINE
   const outputPath = `${inputPath}_out.txt`;
 
-  console.log("Input path:", inputPath);
-  console.log("Output path:", outputPath);
+  // console.log("Input path:", inputPath);
+  // console.log("Output path:", outputPath);
 
 
   exec(`python3 processor.py ${inputPath} ${outputPath}`, (err) => {
@@ -39,7 +39,10 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 app.post("/api/download", upload.single("file"), (req, res) => {
   const newData = "";
   const outputPath = `new_data_out.txt`;
-  exec(`python3 modifier.py ${inputPath} ${outputPath}`, (err) => {
+
+  console.log("Ran download");
+
+  exec(`python3 modifier.py ${newData} ${outputPath}`, (err) => {
     if (err) {
       console.error("Python script failed:", err);
       return res.status(500).send("Python script failed");
