@@ -17,8 +17,6 @@ for line in lines:
         print(f"Value for {check}: {value.strip()}")
         data[check] = value.strip()
 
-with open(output_path, 'wr') as f:
+with open(output_path, 'w') as f:
     for key, value in data.items():
         f.write(f"{value},{key}\n")
-    
-    f.readline()
