@@ -51,7 +51,6 @@ app.post("/api/download", upload.single("file"), (req, res) => {
     const result = fs.readFileSync(outputPath, "utf-8");
     res.json({ content: result });
 
-    fs.unlinkSync(inputPath);
     fs.unlinkSync(outputPath);
   });
 });
