@@ -5,15 +5,17 @@ output_path = sys.argv[2]
     
 data = {}
 with open(input_path, mode='r') as csvfile:
-    for line in lines:
-        if 'AddToWatchWithValue' in line:
-            start = line.index('@::') + 3
-            end = line.index('", ', start)
-            check = line[start:end]
-            
-            value = line[end + 3:len(line) - 3]
-            print(f"Value for {check}: {value.strip()}")
-            data[check] = value.strip()
+    lines = csvfile.readlines()
+    
+for line in lines:
+    if 'AddToWatchWithValue' in line:
+        start = line.index('@::') + 3
+        end = line.index('", ', start)
+        check = line[start:end]
+        
+        value = line[end + 3:len(line) - 3]
+        print(f"Value for {check}: {value.strip()}")
+        data[check] = value.strip()
 
 for key in data:
     print(f"Key: {key}, Value: {data[key]}")
