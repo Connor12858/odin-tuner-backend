@@ -19,7 +19,7 @@ for key in data:
     print(f"Key: {key}, Value: {data[key]}")
 
 with open(output_path, 'w') as f:
-    f.writelines(modified)
+    f.writelines("hi,this is a test\nbye,this is a test\n")
 
 
 
